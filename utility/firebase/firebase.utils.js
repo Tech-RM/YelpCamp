@@ -25,8 +25,12 @@ import {
     collection,
     writeBatch,
     query,
-    getDocs
+    getDocs,
+    updateDoc,
+    deleteDoc,
+    serverTimestamp,
             } from "firebase/firestore";
+import { dateTimeConveter } from "./dateTimeConverter/dateTimeConverter.js";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -67,19 +71,55 @@ export const addCollectionandDocuments= async (collectionKey,objectsToAdd)=>{
 }
 
 export const getCollectionAndDocuments=async()=>{
-    const collectionRef=collection(db,'categories');
+    const collectionRef=collection(db,'camps');
     const q=query(collectionRef);
 
     const querySnapshotDocs=(await getDocs(q)).docs;
     return querySnapshotDocs.map(docSnapshot=>docSnapshot.data());
 }
 
-export const createCampDocument= async (document,someOtherFields={})=>{
+export const getDocumentAndData=async(userQuery)=>{
+    const docRef = doc(db, "camps", userQuery);
+    const docSnap = await getDoc(docRef);
 
+    if (docSnap.exists()) {
+        const res=docSnap.data();
+        const convertedDate1=dateTimeConveter(res.createdAt);
+        if(res.updatedAt){
+            const convertedDate2=dateTimeConveter(res.updatedAt);
+            const responce={...res,createdAt:convertedDate1,updatedAt : convertedDate2}
+            return responce;
+        }else{
+            const responce={...res,createdAt:convertedDate1}
+            return responce;
+        } 
+    } else {
+            // docSnap.data() will be undefined in this case
+            console.log("No such document found!");
+        }
+}
+export const updateDocumentData=async(updatedDocument)=>{
+    if(!updatedDocument) return;
+    console.log("updatedData",updatedDocument);
+    const campDocRef=doc(db,"camps",updatedDocument.id);
+    const res=await updateDoc(campDocRef,{...updatedDocument, updatedAt: serverTimestamp()});
+    console.log("update log",res);
+}
+export const deleteDocumentAndData=async(id)=>{
+    if(!id) return;
+    const campDocRef=doc(db,"camps",id);
+    try {
+        await deleteDoc(campDocRef);
+        console.log("Document deleted successfully.");
+      } catch (error) {
+        console.error("Error deleting document:", error);
+      }
+}
+export const createCampDocument= async (document)=>{
     if(!document) return;
 
     //to check an exissting instance of the document
-    const campDocRef=doc(db,"camps", document.id);//it creates an user docuent refrence.
+    const campDocRef=doc(db,"camps",document.id);//it creates an user docuent refrence.
     //to get the data related to the above documents
     const Snapshot=await getDoc(campDocRef);//creates a snapshot of user data.
 
@@ -87,13 +127,13 @@ export const createCampDocument= async (document,someOtherFields={})=>{
         const {id,title,location}=document;
         const createdAt=new Date();
         try{
-            setDoc(campDocRef,{id,title,location,createdAt,...someOtherFields});
+            setDoc(campDocRef,{id,title,location,createdAt});
 
         }catch(error){
             console.log("Error creating camp instance", error.message);
         }
     }
-    return campDocRef;
+    return getDocumentAndData(document.id);
 }
 
 export const createUserDocumentUsingEmailAndPassword= async (email,password)=>{

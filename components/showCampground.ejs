@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Show Campground</title>
+</head>
+<body>
+    <h1>Show Campground</h1>
+    <a href="/campground/<%=camp.id%>/edit">Edit Camp</a>
+    <form action="/campground/<%=camp.id%>?_method=delete" method="post">
+        <button>Delete</button>
+    </form>
+    <h2>Name:-<%=camp.title %></h2>
+    <h2>Location:-<%=camp.location %></h2>
+    <p>Created on:-<%=camp.createdAt %></p>
+    <% if(camp.updatedAt){ %>
+        <p>Updated on:-<%=camp.updatedAt%></p>
+    <% } %>
+    <% if(camp.about){ %>
+        <p>Camp Details:-<%=camp.about%></p>
+    <% }else{ %>
+        <p> Lorem ipsum dolor sit, amet consectetur adipisicing elit. Officia iure a quo incidunt eligendi soluta fugiat sequi molestias quas veniam neque, rerum veritatis. Dolore, facilis quam sequi consequuntur nam animi!
+            Vero quibusdam dolore, inventore delectus aliquid officiis repudiandae laudantium excepturi eligendi illo natus beatae quaerat molestiae, modi, obcaecati autem blanditiis mollitia exercitationem sint! Vitae quas sit nostrum quibusdam architecto quo.
+            Nisi voluptatem odio rem tenetur! Mollitia sapiente veritatis sit quidem nisi vitae culpa sint error quam quaerat expedita rem, libero quae cumque tempora vero non nam optio et dolore corrupti!
+            Commodi maiores dolore magnam quae officiis modi ullam placeat doloribus sed dolorem aspernatur consequatur similique ipsa repudiandae quo aperiam cumque molestias, sit amet incidunt maxime sapiente iusto illum nisi. Architecto!
+            Soluta, ad odit perferendis nam, unde reiciendis quas neque amet autem temporibus delectus voluptatum id laborum voluptatem aspernatur fuga ipsum nostrum? Dolorem, explicabo vero aliquam consequatur voluptatum modi hic eveniet!
+            Asperiores magni quam ullam excepturi nulla expedita sint odit aliquid vel magnam quod eaque ea tempore saepe, incidunt repellat unde. Iste voluptatibus alias repudiandae omnis ad rerum esse corrupti illum.
+            Dolorem possimus animi, consequuntur ipsum voluptatem eos eaque neque expedita laudantium facilis dolorum enim? Similique quisquam beatae eveniet doloremque nisi, repellat aperiam ratione repellendus odit laudantium itaque autem iusto in.
+            Quidem consequuntur aliquam adipisci fugiat nostrum rerum neque dolorum laudantium vero! Tempora quia impedit libero hic necessitatibus nisi praesentium minima minus dignissimos qui perspiciatis debitis ea, earum veritatis error consequuntur?
+            Earum quidem eos harum architecto dolorum, corrupti iste nisi adipisci incidunt aut, ipsa ipsam veritatis, libero molestiae aliquam quaerat asperiores ullam quo veniam nesciunt est tenetur. Natus enim id neque.
+            Asperiores exercitationem labore beatae ad, saepe quas dignissimos, nemo quo, perferendis deserunt laudantium optio id amet. Sit voluptas pariatur similique odit adipisci optio repellat, consequatur expedita debitis, nisi, ipsum aliquam.
+        </p>
+    <%}%>
+    <a href="/campground">Go to All Camps</a>
+</body>
+</html>
