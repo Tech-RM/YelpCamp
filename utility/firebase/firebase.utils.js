@@ -1,3 +1,7 @@
+const demoText=`Lorem ipsum dolor sit amet consectetur adipisicing elit. Neque, explicabo nostrum? Ipsam nemo sequi fugit odit quam. Eaque saepe, minima neque aperiam ex, eligendi blanditiis, perferendis accusamus repellendus sequi corrupti.
+                Est, quibusdam? Nesciunt dolor eveniet sunt, quasi officia, repellat repellendus modi facere consequatur tenetur provident maiores ullam sint cumque blanditiis! Soluta pariatur quidem sequi iure deserunt eos quam delectus quaerat!
+                Consequuntur repellat reprehenderit animi, perspiciatis fugiat nobis provident eveniet eius accusantium officiis ducimus, omnis voluptates aspernatur illo dicta maxime necessitatibus. Officiis dolor recusandae iusto molestias, molestiae porro laboriosam ducimus adipisci.`
+const demoUrl=`https://images.unsplash.com/photo-1482398650355-d4c6462afa0e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHw0ODQzNTF8fHx8fHx8MTY4ODQ0Mzk3MA&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=700`
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 // TODO: Add SDKs for Firebase products that you want to use
@@ -30,7 +34,7 @@ import {
     deleteDoc,
     serverTimestamp,
             } from "firebase/firestore";
-import { dateTimeConveter } from "./dateTimeConverter/dateTimeConverter.js";
+import { dateTimeConveter, findoutDaysDifference } from "../timeConverterAndHelper/dateTimeConverter.js";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -73,30 +77,57 @@ export const addCollectionandDocuments= async (collectionKey,objectsToAdd)=>{
 export const getCollectionAndDocuments=async()=>{
     const collectionRef=collection(db,'camps');
     const q=query(collectionRef);
-
     const querySnapshotDocs=(await getDocs(q)).docs;
-    return querySnapshotDocs.map(docSnapshot=>docSnapshot.data());
+    const res=querySnapshotDocs.map(docSnapshot=>{
+        const reply=docSnapshot.data();
+        const modifiedData={
+        imageUrl:demoUrl,
+        description:demoText,
+        price:6,
+        ...reply,
+        createdAt:dateTimeConveter(reply.createdAt),
+        updatedAt:dateTimeConveter(reply.updatedAt?reply.updatedAt:reply.createdAt),
+        lastUpdated:findoutDaysDifference(reply.createdAt),
+        };
+        return modifiedData;
+    });
+    return res;
 }
 
 export const getDocumentAndData=async(userQuery)=>{
     const docRef = doc(db, "camps", userQuery);
     const docSnap = await getDoc(docRef);
-
+try{
     if (docSnap.exists()) {
         const res=docSnap.data();
-        const convertedDate1=dateTimeConveter(res.createdAt);
         if(res.updatedAt){
-            const convertedDate2=dateTimeConveter(res.updatedAt);
-            const responce={...res,createdAt:convertedDate1,updatedAt : convertedDate2}
+            const responce={
+                imageUrl:demoUrl,
+                description:demoText,
+                price:6,
+                ...res,
+                createdAt:dateTimeConveter(res.createdAt),
+                updatedAt : dateTimeConveter(res.updatedAt)
+            };
             return responce;
         }else{
-            const responce={...res,createdAt:convertedDate1}
+            const responce={
+                imageUrl:demoUrl,
+                description:demoText,
+                price:6,
+                ...res,
+                createdAt:dateTimeConveter(res.createdAt),
+                updatedAt:dateTimeConveter(res.createdAt),
+            };
             return responce;
         } 
     } else {
             // docSnap.data() will be undefined in this case
-            console.log("No such document found!");
+            throw "No such document found!";
         }
+    }catch(e){
+        console.error(e);
+    }
 }
 export const updateDocumentData=async(updatedDocument)=>{
     if(!updatedDocument) return;

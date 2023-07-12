@@ -11,7 +11,9 @@ for (let i = 0; i < 50; i++) {
     const camp ={
             id:uuid(),
             location: `${CITY[random1000Nos].city}, ${CITY[random1000Nos].state}`,
-            title: `${RandomItems(DESCRIPTORS)} ${RandomItems(PLACES)}`
+            title: `${RandomItems(DESCRIPTORS)} ${RandomItems(PLACES)}`,
+            price:Math.floor(Math.random()*30)+10,
+            image:'',
         }
         let res= await createCampDocument(camp);
         console.log(res);

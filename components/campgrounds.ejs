@@ -1,22 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Camps</title>
-</head>
-<body>
+<% layout('../layout/html-templete') -%>
     <h1>All Camps</h1>
     <a href="/campground/new">Add a new Camp</a>
-    <ul>
         <% for(let camp of camps){ %>
-            <li><a href="/campground/<%=camp.id%>"><%= camp.title %></a>
-                <form action="/campground/<%=camp.id%>?_method=delete" method="post">
-                    <button>Delete</button>
-                </form>
-            </li>
+            <div class="card">
+                <div class="row">
+                    <div class="col-md-4">
+                        <img src="https://images.unsplash.com/photo-1482398650355-d4c6462afa0e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHw0ODQzNTF8fHx8fHx8MTY4ODQ0Mzk3MA&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=300" alt="cardImage">
+                    </div>
+                    <div class="col-md-8">
+                        <h5 class="card-title"><%=camp.title%></h5>
+                        <p class="card-text"><%=camp.description%></p>
+                        <p class="card-text"><small class="text-muted"></small>Last updated on:-<%=camp.updatedAt%></small></p>
+                        <div class="d-flex mb-3">
+                            <a class="btn btn-success ms-5" href="/campground/<%=camp._id%>">Show</a>
+                            <a class="btn btn-primary ms-2" href="/campground/<%=camp._id%>/edit">Edit</a>
+                            <form action="/campground/<%=camp.id%>?_method=delete" method="post">
+                                <button class="btn btn-danger ms-2">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
         <% } %>
-    </ul>
-    
-</body>
-</html>

@@ -1,22 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Campground</title>
-</head>
-<body>
-    <form action="/campground" method="post">
-        <div>
-           <label for="title">Name</label>
-           <input type="text" id="title" name="title">
-        </div>
-        <div>
-            <label for="location">Location</label>
-            <input type="text" id="location" name="location">
-         </div>
-         <button>Add New Camp</button>
-    </form>
-    <a href="/campground">Back to All Camps</a>
-</body>
-</html>
+<% layout('../layout/html-templete') -%>
+<div class="row">
+    <h1 class="text-center">New Capmground</h1>
+    <div class="col-6 offset-3">
+        <form action="/campground" method="post" novalidate class="validated-form">
+            <div class="mb-3">
+                <label class="form-label" for="title">Name</label>
+                <input class="form-control" type="text" id="title" name="title" required>
+                <div class="valid-feedback">Looks good!</div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="location">Location</label>
+                <input class="form-control" type="text" id="location" name="location" required>
+                <div class="valid-feedback">Looks good!</div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="description">Description</label>
+                <textarea class="form-control" name="description" id="description" cols="30" rows="4" required></textarea>
+                <div class="valid-feedback">Looks good!</div>
+            </div>
+            <div class="input-group mb-3">
+                <label class="input-group-text" for="price">Price</label>
+                <span class="input-group-text">₹</span>
+                <input class="form-control" type="number" id="price" name="price" required>
+                <span class="input-group-text">.00</span>
+                <div class="invalid-feedback">Please enter proper vslue/price.</div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="image">Image</label>
+                <input class="form-control" type="file" id="image" name="imageUrl">
+            </div>
+            <button class="btn btn-success mb-3">Add New Camp</button>
+        </form>
+        <a href="/campground">Back to All Camps</a>
+    </div>
+</div>
