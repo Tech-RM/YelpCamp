@@ -2,16 +2,22 @@ import express from 'express';
 import ejsMate from 'ejs-mate';
 import  methodOverride  from 'method-override';
 import path from 'path';
+import session from 'express-session';
+import flash from 'connect-flash';
+import passport from 'passport';
+import localStrategy from 'passport-local';
+
+
 //***In ES modules, you can use the import.meta.url
 // property to get the URL of the current module file.
 // You can then manipulate this URL to extract the directory path */
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import handleAsyncError from './utility/errorHandling/asyncErrorHandling.js';
 import ExpressError from './utility/Express/expressError.js';
-import validateCampData from './utility/JoiValidation/validateFields.js';
-import { createNewCampground, deleteCampground, getAllCampgrounds, getParticularCampgroundData, updateCampground } from './utility/mongoose/mongoose.utils.js';
-
+import campRouter from './routes/campground.route.js';
+import reviewRouter from './routes/review.route.js';
+import userRouter from './routes/user.route.js';
+import User from './utility/mongoose/model/user.model.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -28,43 +34,45 @@ app.set('views', path.join(__dirname, 'components'));
 
 app.use(express.urlencoded({extended:true}));
 app.use(methodOverride('_method'));
+app.use(express.static(path.join(__dirname, "public")));
+
+const sessionConfig={
+    secret:"Thisismyrealsecret",
+    resave:false,
+    saveUninitialized:true,
+    cookie:{
+        httpOnly:true,
+        expires: Date.now() + 1000*60*60*24,
+        maxAge: 1000*60*60*24,
+    }
+};
+
+app.use(session(sessionConfig));
+
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new localStrategy(User.authenticate()));
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+
+app.use(flash());
+app.use((req,res,next)=>{
+    res.locals.currentUser=req.user;
+    res.locals.success=req.flash("success");
+    res.locals.error=req.flash("error");
+    next();
+})
+
+app.use("/user",userRouter);
+app.use("/campground",campRouter);
+app.use("/campground/:id/reviews",reviewRouter);
 
 app.get('/',(req,res)=>{
     res.render('home');
 })
-app.get('/campground',handleAsyncError(async(req,res)=>{
-    const camps= await getAllCampgrounds();
-    res.render('campgrounds',{camps});
-}))
-app.post('/campground',validateCampData,handleAsyncError(async(req,res)=>{
-    const data=req.body;
-    const camp=await createNewCampground(data);
-    res.render('showCampground',{camp});
-}))
-app.get('/campground/new',handleAsyncError(async(req,res)=>{
-    res.render('newCampground');
-}))
-app.get('/campground/:id',handleAsyncError(async(req,res)=>{
-    const {id}=req.params;
-    const camp= await getParticularCampgroundData(id);
-    res.render('showCampground',{camp});
-}))
-app.get('/campground/:id/edit',handleAsyncError(async(req,res)=>{
-    const {id}=req.params;
-    const camp= await getParticularCampgroundData(id);
-    res.render('editCampground',{camp});
-}))
-app.put('/campground/:id',validateCampData,handleAsyncError(async(req,res)=>{
-    const {id}=req.params;
-    const data=req.body;
-    await updateCampground({id,...data});
-    res.redirect(302,`/campground/${id}`);
-}))
-app.delete('/campground/:id',handleAsyncError(async(req,res)=>{
-    const {id}=req.params;
-    await deleteCampground(id);
-    res.redirect(302,"/campground");
-}))
+
 app.all('/*',(req,res,next)=>{
     next(new ExpressError("Page not found",404));
 })

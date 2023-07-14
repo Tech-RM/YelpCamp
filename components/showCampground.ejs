@@ -1,24 +1,59 @@
 <% layout('../layout/html-templete') -%>
 <div class="row">
-    <div class="card col-8 offset-2 mb-3">
-        <img src="<%=camp.imageUrl%>" class="card-img-top mt-2" alt="imageCard">
-        <div class="card-body">
-          <h5 class="card-title"><%=camp.title%></h5>
-          <p class="card-text"><%=camp.description%></p>
+    <div class="col mb-3">
+      <div class="row d-flex justify-content-between">
+        <div class="card col-7">
+          <img src="<%=camp.imageUrl%>" class="card-img-top mt-2" alt="imageCard">
+          <div class="card-body">
+            <h5 class="card-title"><%=camp.title%></h5>
+            <p class="card-text"><%=camp.description%></p>
+          </div>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item"><h3>Location:-<%=camp.location %></h3></li>
+            <li class="list-group-item"><h5>Rs.<%=camp.price%> /day</h5></li>
+            <li class="list-group-item">Created on:-<%=camp.createdAt %></li>
+            <li class="list-group-item">Updated on:-<%=camp.updatedAt%></li>
+          </ul>
+          <div class="card-body">
+            <a href="/campground" class="btn btn-primary card-link">Back to Camps</a>
+            <a href="/campground/<%=camp.id%>/edit" class="btn btn-info card-link">Edit Camp</a>
+            <form class="d-inline ms-3" action="/campground/<%=camp.id%>?_method=delete" method="post">
+                  <button class="btn btn-danger">Delete</button>
+              </form>
+            
+          </div>
         </div>
-        <ul class="list-group list-group-flush">
-          <li class="list-group-item"><h3>Location:-<%=camp.location %></h3></li>
-          <li class="list-group-item">Price:- Rs. <%=camp.price%>.00/-</li>
-          <li class="list-group-item">Created on:-<%=camp.createdAt %></li>
-          <li class="list-group-item">Updated on:-<%=camp.updatedAt%></li>
-        </ul>
-        <div class="card-body">
-          <a href="/campground" class="btn btn-primary card-link">Back to Camps</a>
-          <a href="/campground/<%=camp.id%>/edit" class="btn btn-info card-link">Edit Camp</a>
-          <form class="d-inline ms-3" action="/campground/<%=camp.id%>?_method=delete" method="post">
-                <button class="btn btn-danger">Delete</button>
-            </form>
-          
+        <div class="col-4">
+            <%if(camp.reviews.length){%>
+              <div>
+                <h3 class="mb-3">Reviews</h3>
+                <% for(let review of camp.reviews){%>
+                  <div class="card mb-3">
+                    <div class="card-body">
+                      <h5 class="card-title">Rating: <%=review.rating%></h5>
+                      <p class="card-text">Review: <%=review.reviewText%></p>
+                      <form action="/campground/<%=camp.id%>/reviews/<%=review.id%>?_method=delete" method="post">
+                        <button class="btn btn-sm btn-danger">Delete</button>
+                    </form>
+                    </div>
+                  </div>
+                <%}%>
+              </div>
+            <%}%>
+            <div class="review-input card p-3">
+              <h3>Add new Review</h3>
+              <form action="/campground/<%=camp.id%>/reviews" method="post" novalidate class="validated-form">
+                <label class="form-label" for="rating">Give us some rating</label>
+                <input class="form-range" type="range" name="rating" id="rating" min="0" max="5">
+                <div class="mb-3">
+                  <label class="form-label" for="review">Write your review:</label>
+                  <textarea class="form-input form-control" name="reviewText" id="review" cols="20" rows="3" required></textarea>
+                  <div class="valid-feedback"> Now it looks good!!!!</div>
+                </div>
+                <button class="btn btn-primary ms-2">Add Review</button>
+              </form>
+            </div>
         </div>
       </div>
+    </div>
 </div>

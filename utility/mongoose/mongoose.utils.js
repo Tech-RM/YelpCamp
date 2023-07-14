@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import Campground from "./model/campGround.model.js";
+import Review from "./model/review.model.js";
 
 
 
@@ -30,18 +31,18 @@ export const getAllCampgrounds=async()=>{
 }
 
 export const getParticularCampgroundData=async(id)=>{
-    const data=await Campground.find({_id:id});
-    if(!data.length){
+    const data=await Campground.findById(id).populate("reviews").populate("author");
+    console.log("Data from utils",data);
+    if(!data){
         console.log("No data found from DB");
         throw Error;
     }else{
-        return data[0];
+        return data;
     }  
 }
 
 export const deleteCampground=async(id)=>{
     const data=await Campground.findOneAndDelete({_id:id});
-    console.log(data);
     if(data){
     console.log(`Deleted Campground:- ${data}`);
     }else{
@@ -60,4 +61,22 @@ export const updateCampground=async(data)=>{
             console.log("No such document found to update");
             throw Error;
         }
+}
+export const addReviewToCamp=async(id,review)=>{
+    if(!id||!review) throw Error;
+    try{
+        const camp= await Campground.findById(id);
+        const newReview=new Review(review);
+        camp.reviews.push(newReview);
+        await newReview.save();
+        await camp.save();
+    }catch(err){
+        console.log(err);
+        throw Error;
+    }
+}
+export const deleteReviewFromCamp=async(campId,reviewId)=>{
+    const targetPull={reviews:reviewId};
+    await Campground.findByIdAndUpdate(campId,{$pull:targetPull});
+    await Review.findByIdAndDelete(reviewId);
 }

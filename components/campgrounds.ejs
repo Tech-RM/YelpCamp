@@ -2,10 +2,10 @@
     <h1>All Camps</h1>
     <a href="/campground/new">Add a new Camp</a>
         <% for(let camp of camps){ %>
-            <div class="card">
+            <div class="card my-2">
                 <div class="row">
-                    <div class="col-md-4">
-                        <img src="https://images.unsplash.com/photo-1482398650355-d4c6462afa0e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHw0ODQzNTF8fHx8fHx8MTY4ODQ0Mzk3MA&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=300" alt="cardImage">
+                    <div class="col-md-4 imgContainer">
+                        <img class="titleImage" src="<%=camp.imageUrl%>" alt="cardImage">
                     </div>
                     <div class="col-md-8">
                         <h5 class="card-title"><%=camp.title%></h5>

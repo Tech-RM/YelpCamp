@@ -22,10 +22,18 @@
             </ul>
           </li>
         </ul>
-        <form class="d-flex" role="search">
-          <input class="form-control me-2" type="search" placeholder="Search">
-          <button class="btn btn-outline-success" type="submit">Search</button>
-        </form>
+        <div class="navbar-nav ml-auto">
+          <%if(!currentUser){%>
+            <a href="/user/login" class="nav-link">Login</a>
+            <a href="/user/register" class="nav-link">Register</a>
+            <%}else{%>
+            <form class="d-flex me-5" role="search">
+              <input class="form-control me-2" type="search" placeholder="Search">
+              <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+            <a href="/user/logout" class="nav-link">Logout</a>
+            <%}%>
+        </div>
       </div>
     </div>
   </nav>
