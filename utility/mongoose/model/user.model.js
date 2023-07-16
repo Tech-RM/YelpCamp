@@ -12,6 +12,8 @@ const userSchema=new Schema({
         required:true,
         unique:true,
     },
+},{ 
+    timestamps: true, //It will generate createdAt and updatedAt automatically for us...
 });
 userSchema.plugin(passportLocalMongoose);
 

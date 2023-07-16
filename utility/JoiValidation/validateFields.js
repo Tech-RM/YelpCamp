@@ -12,11 +12,28 @@ const validationHelper=(JoiSchema,InputData,next)=>{
 
 export const validateCampData=(req,res,next)=>{
     const dataStructure=Joi.object({
-        title: Joi.string().required().min(8).max(50),
-        imageUrl:Joi.string(),
-        description:Joi.string().required().min(10).max(500),
-        price:Joi.number().required().min(1).max(10000),
-        location:Joi.string().required().min(5),
+        title: Joi.string().required(),
+        images:{
+            path:Joi.string().required(),
+            filename:Joi.string().required(), 
+        },
+        description:Joi.string().required(),
+        price:Joi.number().required(),
+        location:Joi.string().required(),
+    });
+    validationHelper(dataStructure,req.body,next);
+}
+export const validateUpdateCampData=(req,res,next)=>{
+    const dataStructure=Joi.object({
+        title: Joi.string().required(),
+        images:{
+            path:Joi.string(),
+            filename:Joi.string(),
+        },
+        description:Joi.string().required(),
+        price:Joi.number().required(),
+        location:Joi.string().required(),
+        deleteImages:Joi.array(),
     });
     validationHelper(dataStructure,req.body,next);
 }
@@ -24,8 +41,8 @@ export const validateCampData=(req,res,next)=>{
 
 export const validateReview=(req,res,next)=>{
     const dataStructure=Joi.object({
-        reviewText:Joi.string().required().min(8).max(100),
-        rating:Joi.number().required().min(0).max(5),
+        reviewText:Joi.string().required(),
+        rating:Joi.number().required(),
     });
     validationHelper(dataStructure,req.body,next);
 }

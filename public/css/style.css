@@ -4,3 +4,15 @@
     border-radius: 20px;
     padding:0.5rem;
 }
+
+.showImg{
+    height: 100px;
+    width: auto;
+    margin: 5px;
+    border: 2px solid green;
+}
+.customCheck{
+    position: relative;
+    top:5px;
+    right:30px;  
+}

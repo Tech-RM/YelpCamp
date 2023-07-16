@@ -10,6 +10,14 @@ const reviewSchema=new Schema({
         type:Number,
         required:true,
     },
+    author:{
+        type:Schema.Types.ObjectId,
+        ref:"User",
+        required:true,
+    },
+},
+{ 
+    timestamps: true, //It will generate createdAt and updatedAt automatically for us...
 });
 
 const Review =mongoose.model("Review",reviewSchema);

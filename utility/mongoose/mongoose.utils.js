@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import Campground from "./model/campGround.model.js";
 import Review from "./model/review.model.js";
+import { deleteImages } from "../cloudinary/cloudinary.utils.js";
+
 
 
 
@@ -19,8 +21,8 @@ try{
 }
 
 
-export const createNewCampground= async(data)=>{
-    const newCamp= new Campground(data);
+export const createNewCampground= async(campData)=>{
+    const newCamp= new Campground(campData);
     const res=await newCamp.save();
     return res;
 }
@@ -31,8 +33,14 @@ export const getAllCampgrounds=async()=>{
 }
 
 export const getParticularCampgroundData=async(id)=>{
-    const data=await Campground.findById(id).populate("reviews").populate("author");
-    console.log("Data from utils",data);
+    const data=await Campground.findById(id)
+    .populate({
+        path:"reviews",
+        populate:{
+            path:"author"
+        }
+    })
+    .populate("author");
     if(!data){
         console.log("No data found from DB");
         throw Error;
@@ -44,29 +52,43 @@ export const getParticularCampgroundData=async(id)=>{
 export const deleteCampground=async(id)=>{
     const data=await Campground.findOneAndDelete({_id:id});
     if(data){
-    console.log(`Deleted Campground:- ${data}`);
     }else{
         console.log("No such document found");
         throw Error;
     }
 }
 
-export const updateCampground=async(data)=>{
-    const query={_id:data.id};
-    const res= await Campground.findOneAndUpdate(query,data);
+export const updateCampground=async(id,req)=>{
+    const data=req.body;
+    const inputImages=req.files.map(file=>({path:file.path,filename:file.filename}));
+    
+    const res= await Campground.findByIdAndUpdate(id,data);
+    res.images.push(...inputImages);
+    await res.save();
+    if(data.deleteImages){
+        //remove the images from cloudinary
+    
+        await deleteImages(data.deleteImages);
+       
+        //remove the images from database
+        await res.updateOne({
+            $pull:{
+                images:{
+                    filename:{$in:data.deleteImages}
+                }}});
+    }
     if(res){
-        console.log(`Updated Campground:- ${res}`);
         return res;
         }else{
             console.log("No such document found to update");
             throw Error;
         }
 }
-export const addReviewToCamp=async(id,review)=>{
-    if(!id||!review) throw Error;
+export const addReviewToCamp=async(campId,author,review)=>{
+    if(!(campId&&review&&author)) throw Error;
     try{
-        const camp= await Campground.findById(id);
-        const newReview=new Review(review);
+        const camp= await Campground.findById(campId);
+        const newReview=new Review({author,...review});
         camp.reviews.push(newReview);
         await newReview.save();
         await camp.save();

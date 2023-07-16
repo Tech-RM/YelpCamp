@@ -1,58 +1,22 @@
 import express from "express";
-const userRouter=express.Router();
-import handleAsyncError from '../utility/errorHandling/asyncErrorHandling.js';
-import User from "../utility/mongoose/model/user.model.js";
-import passport from "passport";
 import { storeReturnTo } from "../utility/middlewares.js";
+import { RegistrationFormController, loginPageController, logoutController, userIndexPage, userLoginController, userRegistrationController } from "../controller/user.controller.js";
+import { passportLoginHelper } from "../utility/passport/passport.utils.js";
 
 
-userRouter.get("/",(req,res)=>{
-    res.send("Welcome to user route.")
-});
+const userRouter=express.Router();
 
-userRouter.get("/register",(req,res)=>{
-    res.render("userRegistrationForm");
-});
+userRouter.get("/",userIndexPage);
 
-userRouter.post("/register",handleAsyncError(async(req,res)=>{
-    const {name,username,email,password}=req.body;
-    try{
-        const newUser=new User({name,username,email});
-        const registeredUser=await User.register(newUser,password);
-        req.login(registeredUser,function(err){
-            if(err){
-                return next(err);
-            }
-            req.flash("success","Welcome to YelpCamp!!!!");
-            res.redirect(302,"/campground");
-        });
-    }catch(e){
-        req.flash("error",e.message);
-        console.log(e);
-        res.redirect(302,"/user/register");
-    }
-}));
+userRouter.route("/register")
+    .get(RegistrationFormController)
+    .post(userRegistrationController);
 
-userRouter.get("/login",(req,res)=>{
-    res.render("userLoginForm");
-});
+userRouter.route("/login")
+    .get(loginPageController)
+    .post(storeReturnTo,passportLoginHelper,userLoginController);
 
-userRouter.post("/login",storeReturnTo,passport.authenticate("local", {failureFlash:true, failureRedirect:"/user/login"}), handleAsyncError(async(req,res)=>{
-    req.flash("success","Welcome back to YelpCamp.");
-    const redirectUrl=res.locals.returnTo||"/campground";
-    delete req.session.returnTo;
-    res.redirect(302,redirectUrl);
-}));
-
-userRouter.get("/logout",(req,res,next)=>{
-    req.logout(function(err){
-        if(err){
-            return next(err);
-        }
-        req.flash("success","You have successfully logged out.");
-        res.redirect(302,"/user/login");   
-    });
-});
+userRouter.get("/logout",logoutController);
 
 
 

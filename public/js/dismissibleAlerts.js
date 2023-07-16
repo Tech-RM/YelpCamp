@@ -16,4 +16,4 @@ setTimeout(function() {
         alertElement.addEventListener("transitionend", function() {
             this.remove();
         });
-}, 3000);
+}, 6000);

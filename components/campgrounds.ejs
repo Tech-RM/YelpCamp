@@ -5,7 +5,7 @@
             <div class="card my-2">
                 <div class="row">
                     <div class="col-md-4 imgContainer">
-                        <img class="titleImage" src="<%=camp.imageUrl%>" alt="cardImage">
+                        <img class="titleImage" src="<%=camp.images[0].path%>" alt="cardImage">
                     </div>
                     <div class="col-md-8">
                         <h5 class="card-title"><%=camp.title%></h5>
@@ -13,10 +13,12 @@
                         <p class="card-text"><small class="text-muted"></small>Last updated on:-<%=camp.updatedAt%></small></p>
                         <div class="d-flex mb-3">
                             <a class="btn btn-success ms-5" href="/campground/<%=camp._id%>">Show</a>
+                            <%if(currentUser&&camp.author._id.equals(currentUser._id)){%>
                             <a class="btn btn-primary ms-2" href="/campground/<%=camp._id%>/edit">Edit</a>
                             <form action="/campground/<%=camp.id%>?_method=delete" method="post">
                                 <button class="btn btn-danger ms-2">Delete</button>
                             </form>
+                            <%}%>
                         </div>
                     </div>
                 </div>

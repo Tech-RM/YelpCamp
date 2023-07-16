@@ -1,9 +1,43 @@
 <% layout('../layout/html-templete') -%>
+<link rel="stylesheet" href="/css/starRatings.css">
 <div class="row">
     <div class="col mb-3">
       <div class="row d-flex justify-content-between">
         <div class="card col-7">
-          <img src="<%=camp.imageUrl%>" class="card-img-top mt-2" alt="imageCard">
+          <section>
+            <% if(camp.images && (camp.images.length===1)){ %>
+              <img class="w-100" src="<%=camp.images[0].path%>" alt="YelpCamp img">
+            <%}%>
+
+            <% if(camp.images && (camp.images.length>1)){ %>
+              <div id="campCarousel" class="carousel slide" data-bs-interval="2000" data-bs-ride="carousel">
+                <div class="carousel-indicators">
+                  <%for(let i=0; i < camp.images.length; i++){%>
+                  <button type="button" data-bs-target="#campCarousel" data-bs-slide-to="<%=i%>" class="<%=i===0?'active':''%>" aria-label="Slide <%=i+1%>"></button>
+                  <%}%>
+                </div>
+                <div class="carousel-inner">
+                  <%for(let i=0; i < camp.images.length; i++){%>
+                    <div class="carousel-item <%=i===0?'active':''%>">
+                      <img src="<%=camp.images[i].slider%>" class="d-block w-100" alt="YelpCamp Images">
+                      <div class="carousel-caption d-none d-md-block">
+                        <h5></h5>
+                        <p></p>
+                      </div>
+                    </div>
+                  <%}%>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#campCarousel" data-bs-slide="prev">
+                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#campCarousel" data-bs-slide="next">
+                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Next</span>
+                </button>
+              </div>
+            <%}%>
+          </section>
           <div class="card-body">
             <h5 class="card-title"><%=camp.title%></h5>
             <p class="card-text"><%=camp.description%></p>
@@ -11,16 +45,18 @@
           <ul class="list-group list-group-flush">
             <li class="list-group-item"><h3>Location:-<%=camp.location %></h3></li>
             <li class="list-group-item"><h5>Rs.<%=camp.price%> /day</h5></li>
+            <li class="list-group-item"><strong>Created by: <%=camp.author.name%></strong></li>
             <li class="list-group-item">Created on:-<%=camp.createdAt %></li>
             <li class="list-group-item">Updated on:-<%=camp.updatedAt%></li>
           </ul>
           <div class="card-body">
             <a href="/campground" class="btn btn-primary card-link">Back to Camps</a>
+            <%if(currentUser&&camp.author._id.equals(currentUser._id)){%>
             <a href="/campground/<%=camp.id%>/edit" class="btn btn-info card-link">Edit Camp</a>
             <form class="d-inline ms-3" action="/campground/<%=camp.id%>?_method=delete" method="post">
                   <button class="btn btn-danger">Delete</button>
               </form>
-            
+            <%}%>
           </div>
         </div>
         <div class="col-4">
@@ -30,11 +66,14 @@
                 <% for(let review of camp.reviews){%>
                   <div class="card mb-3">
                     <div class="card-body">
-                      <h5 class="card-title">Rating: <%=review.rating%></h5>
+                      <h6 class="card-title mb-2 text-body-secondary"><%=review.author.name%></h6>
+                      <p class="starability-result mb-2" data-rating="<%=review.rating%>"></p>
                       <p class="card-text">Review: <%=review.reviewText%></p>
-                      <form action="/campground/<%=camp.id%>/reviews/<%=review.id%>?_method=delete" method="post">
-                        <button class="btn btn-sm btn-danger">Delete</button>
-                    </form>
+                      <%if(currentUser&&review.author._id.equals(currentUser._id)){%>
+                        <form action="/campground/<%=camp.id%>/reviews/<%=review.id%>?_method=delete" method="post">
+                          <button class="btn btn-sm btn-danger">Delete</button>
+                        </form>
+                      <%}%>
                     </div>
                   </div>
                 <%}%>
@@ -44,7 +83,27 @@
               <h3>Add new Review</h3>
               <form action="/campground/<%=camp.id%>/reviews" method="post" novalidate class="validated-form">
                 <label class="form-label" for="rating">Give us some rating</label>
-                <input class="form-range" type="range" name="rating" id="rating" min="0" max="5">
+                  <!-- Change starability-basic to different class to see animations. -->
+                  <fieldset class="starability-growRotate">
+                    <input type="radio" id="no-rate" class="input-no-rate" name="rating" value="0" checked aria-label="No rating." />
+
+                    <input type="radio" id="rate1" name="rating" value="1" />
+                    <label for="rate1">1 star.</label>
+
+                    <input type="radio" id="rate2" name="rating" value="2" />
+                    <label for="rate2">2 stars.</label>
+
+                    <input type="radio" id="rate3" name="rating" value="3" />
+                    <label for="rate3">3 stars.</label>
+
+                    <input type="radio" id="rate4" name="rating" value="4" />
+                    <label for="rate4">4 stars.</label>
+
+                    <input type="radio" id="rate5" name="rating" value="5" />
+                    <label for="rate5">5 stars.</label>
+
+                    <span class="starability-focus-ring"></span>
+                  </fieldset>
                 <div class="mb-3">
                   <label class="form-label" for="review">Write your review:</label>
                   <textarea class="form-input form-control" name="reviewText" id="review" cols="20" rows="3" required></textarea>

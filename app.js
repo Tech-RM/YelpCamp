@@ -4,8 +4,7 @@ import  methodOverride  from 'method-override';
 import path from 'path';
 import session from 'express-session';
 import flash from 'connect-flash';
-import passport from 'passport';
-import localStrategy from 'passport-local';
+
 
 
 //***In ES modules, you can use the import.meta.url
@@ -17,14 +16,14 @@ import ExpressError from './utility/Express/expressError.js';
 import campRouter from './routes/campground.route.js';
 import reviewRouter from './routes/review.route.js';
 import userRouter from './routes/user.route.js';
-import User from './utility/mongoose/model/user.model.js';
+import {initializePassport} from './utility/passport/passport.utils.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 //****END ******/
 
 
-const app=express();
+export const app=express();
 
 // use ejs-locals for all ejs templates:
 app.engine('ejs', ejsMate);
@@ -48,14 +47,7 @@ const sessionConfig={
 };
 
 app.use(session(sessionConfig));
-
-app.use(passport.initialize());
-app.use(passport.session());
-passport.use(new localStrategy(User.authenticate()));
-
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
-
+initializePassport();
 
 app.use(flash());
 app.use((req,res,next)=>{
